@@ -1,0 +1,69 @@
+tosca_definitions_version: nativeedge_1_0
+
+description: Generate Tokens and Create Repository
+
+imports:
+  - nativeedge/types/types.yaml
+  - plugin:nativeedge-aws-plugin
+
+inputs:
+
+  aws_access_key_id:
+    type: string
+    display_label: Access Key
+    default: { get_secret: aws_access_key_id }
+
+  aws_secret_access_key:
+    type: string
+    display_label: Secret Key
+    default: { get_secret: aws_secret_access_key }
+
+  region_name:
+    type: string
+    display_label: Client Config
+    default: us-east-2
+
+  client_config:
+    type: dict
+    display_label: Client Config
+    description: The dictionary configuration of a boto3 client.
+    default:
+      aws_access_key_id: { get_input: aws_access_key_id }
+      aws_secret_access_key: { get_input: aws_secret_access_key }
+      region_name: { get_input: region_name }
+
+  registry_id:
+    display_label: Registry Id
+    type: string
+    description: Account ID associated with an ECR registry.
+
+  repo_name:
+    display_label: Repo Name
+    type: string
+    description: The name of a repo.
+
+node_templates:
+
+  token:
+    type: nativeedge.nodes.aws.ecr.AuthenticationToken
+    properties:
+      client_config: { get_input: client_config }
+      resource_config:
+        registryIds:
+          - { get_input: registry_id }
+
+  repo:
+    type: nativeedge.nodes.aws.ecr.Repository
+    properties:
+      client_config: { get_input: client_config }
+      resource_config:
+        registryId: { get_input: registry_id }
+        repositoryName: { get_input: repo_name }
+        Tags:
+          - Key: created-by
+            Value: ecr-feature-demo
+        imageTagMutability: MUTABLE
+        imageScanningConfiguration:
+          scanOnPush: true
+        encryptionConfiguration:
+          encryptionType: AES256
