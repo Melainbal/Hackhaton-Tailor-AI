@@ -15,6 +15,7 @@ const steps = [
   { title: "Quantization", content: "To optimize performance, please choose a quantization factor.",
     options: ["Quantize by factor of 4 - faster answers, less accurate", "Quantize by factor of 2 - slower answers, more accurate"] },
   { title: "Deployment", content: "Moving on to the deployment", options: ["Upload blueprint.yaml to Dell Cloudify", "Cancel"] },
+  { title: "Completed", content: "🎉 The wizard is complete! Thank you for using Tailor AI.", options: [] }
 ];
 
 const Wizard = () => {
@@ -22,7 +23,8 @@ const Wizard = () => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [userInput, setUserInput] = useState("");
   const [machineSpecs, setMachineSpecs] = useState(null);
-  // const specs = getMachineSpecs();
+  const [uploadResponse, setUploadResponse] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleConnectToRemote = async () => {
     try {
@@ -34,22 +36,25 @@ const Wizard = () => {
   };
 
   const handleUploadBlueprint = async () => {
+    setIsUploading(true);
     try {
       const response = await fetch("http://localhost:5000/api/upload-blueprint", { method: "POST" });
       const data = await response.json();
-      if (response.ok) {
-        alert("Blueprint uploaded successfully!");
-      } else {
-        alert(`Upload failed: ${data.error}`);
-      }
+      setUploadResponse(data.message || `Error: ${data.error}`);
     } catch (error) {
-      alert("An error occurred while uploading the blueprint.");
+      setUploadResponse("An error occurred while uploading the blueprint.");
       console.error(error);
     }
+    setIsUploading(false);
   };
 
-  const nextStep = () => {
-    if (currentStep < steps.length - 1) {
+  const nextStep = async () => {
+    if (currentStep < steps.length - 1 ) {
+      if (currentStep === 6 && selectedOption === "Upload blueprint.yaml to Dell Cloudify") {
+        setIsUploading(true);
+        await handleUploadBlueprint();
+        setIsUploading(false);
+      }
       setCurrentStep(currentStep + 1);
       setSelectedOption(null);
       setUserInput("");
@@ -93,7 +98,11 @@ const Wizard = () => {
       <div className="text-center mb-14 text-lg text-gray-700">
         {steps[currentStep].content}
       </div>
-      
+      {currentStep === steps.length - 1 && uploadResponse && (
+        <div className="mt-6 p-4 border rounded-lg bg-gray-100 text-gray-800 text-center">
+        <strong>Upload Response:</strong> {uploadResponse}
+      </div>
+      )}
       {currentStep === 1 ? (
         <div className="text-center mb-14">
           <textarea
@@ -144,15 +153,8 @@ const Wizard = () => {
           {steps[currentStep].options.map((option, index) => (
             <button
               key={index}
-              className={`block w-full px-8 py-4 mb-3 rounded-lg text-xl ${
-                selectedOption === option ? "bg-blue-600 text-white" : "bg-gray-200 text-black"
-              }`}
-              onClick={() => {
-                setSelectedOption(option);
-                if (option === "Upload blueprint.yaml to Dell Cloudify") {
-                  handleUploadBlueprint();
-                }
-              }}
+              className={`block w-full px-8 py-4 mb-3 rounded-lg text-xl ${selectedOption === option ? "bg-blue-600 text-white" : "bg-gray-200 text-black"}`}
+              onClick={() => setSelectedOption(option)}
             >
               {option}
             </button>
@@ -179,14 +181,24 @@ const Wizard = () => {
           disabled={currentStep === 0}
         >
           Previous
+
         </button>
-        <button
-          className="px-8 py-4 bg-blue-600 text-white rounded-lg text-xl disabled:opacity-50"
-          onClick={nextStep}
-          disabled={currentStep === steps.length - 1 || (currentStep === 1 && userInput.trim() === "") || (steps[currentStep].options.length > 0 && selectedOption === null && currentStep !== 1)}
-        >
-          Next
-        </button>
+        {currentStep === steps.length - 1 ? (
+          <button
+            className="px-8 py-4 bg-green-600 text-white rounded-lg text-xl"
+            onClick={() => setCurrentStep(0)}
+          >
+            Restart Wizard
+          </button>
+        ) : (
+          <button
+            className="px-8 py-4 bg-blue-600 text-white rounded-lg text-xl disabled:opacity-50"
+            onClick={nextStep}
+            disabled={currentStep === steps.length || (currentStep === 1 && userInput.trim() === "") || (steps[currentStep].options.length > 0 && selectedOption === null && currentStep !== 1)}
+          >
+            {isUploading ? "Uploading..." : "Next"}
+          </button>
+        )}
       </div>
     </div>
   );

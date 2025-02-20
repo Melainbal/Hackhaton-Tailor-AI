@@ -1,5 +1,5 @@
-require("dotenv").config();
 const express = require("express");
+const path = require("path"); 
 const cors = require("cors");
 const { Client } = require("ssh2");
 const fs = require("fs");
