@@ -16,6 +16,7 @@ const StepContent = ({
     const handleConnectToRemote = async () => {
         try {
         const response = await axios.post("http://localhost:5000/api/connect-to-remote");
+        console.log(response.data.specs)
         setMachineSpecs(response.data.specs);
         } catch (error) {
         console.error("Error connecting to remote system:", error);
