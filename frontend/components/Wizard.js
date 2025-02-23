@@ -62,7 +62,7 @@ const Wizard = () => {
   };
 
   return (
-    <div className="max-w-7xl w-full mx-auto p-20 bg-white shadow-2xl rounded-xl min-h-screen">
+    <div className="max-w-9xl w-full mx-auto p-20 bg-white shadow-2xl rounded-xl min-h-screen">
       <div className="text-center mb-10 flex flex-col items-center">
         <Image src="/images/logo.png" alt="Tailor AI Logo" width={350} height={350} />
       </div>

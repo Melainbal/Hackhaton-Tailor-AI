@@ -59,9 +59,6 @@ node_templates:
       resource_config:
         registryId: { get_input: registry_id }
         repositoryName: { get_input: repo_name }
-        Tags:
-          - Key: created-by
-            Value: ecr-feature-demo
         imageTagMutability: MUTABLE
         imageScanningConfiguration:
           scanOnPush: true

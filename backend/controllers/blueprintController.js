@@ -9,35 +9,34 @@ exports.uploadBlueprint = async (req, res) => {
         console.log("Received request to upload blueprint...");
         const apiUrl = process.env.DSP_MANAGER_URL;
         const token = process.env.DSP_MANAGER_TOKEN;
-        const blueprintFile = "blueprint.yaml";
-        const blueprintPath = path.join(__dirname, "../blueprints", blueprintFile);
+        const blueprintFolder = path.join(__dirname, "../blueprints/AI_Solution");
 
         if (!apiUrl || !token) {
             console.error("Missing API URL or Token");
             return res.status(500).json({ error: "Missing API URL or Token" });
         }
 
-        if (!fs.existsSync(blueprintPath)) {
-            console.error("Blueprint file not found:", blueprintPath);
+        if (!fs.existsSync(blueprintFolder)) {
+            console.error("Blueprint folder not found:", blueprintFolder);
             return res.status(400).json({ error: "Blueprint file not found" });
         }
 
         console.log("Creating ZIP archive...");
-        const zipFilePath = await createZipFile(blueprintPath);
+        const zipFilePath = await createZipFile(blueprintFolder);
 
         // Prepare FormData for upload
         const formData = new FormData();
         formData.append("params", JSON.stringify({
             visibility: "tenant",
             version: "1.0.0",
-            application_file_name: blueprintFile
+            application_file_name: "blueprint.yaml" 
         }));
         formData.append("blueprint_archive", fs.createReadStream(zipFilePath));
 
         // Set headers
         const headers = { "Authentication-Token": token, "tenant": "default_tenant" };
 
-        console.log(`📡 Sending PUT request to ${apiUrl}/api/v3.1/blueprints/AI_Solution`);
+        console.log(`Sending PUT request to ${apiUrl}/api/v3.1/blueprints/AI_Solution`);
         const response = await fetch(`${apiUrl}/api/v3.1/blueprints/AI_Solution`, {
             method: "PUT",
             headers: headers,
