@@ -81,7 +81,7 @@ const Wizard = () => {
         setUserInput={setUserInput}
         selectedOption={selectedOption}
         setSelectedOption={setSelectedOption}
-        setMachineSpecs={setSelectedOption}
+        setMachineSpecs={setMachineSpecs}
         machineSpecs={machineSpecs}
         uploadResponse={uploadResponse}
       />
