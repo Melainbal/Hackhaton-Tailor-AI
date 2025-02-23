@@ -59,22 +59,30 @@ app.post("/api/connect-to-remote", async (req, res) => {
 // Blueprint Upload API
 app.post("/api/upload-blueprint", async (req, res) => {
     try {
+
+      console.log("📌 Received request to upload blueprint...");
       const apiUrl = process.env.DSP_MANAGER_URL;
       const token = process.env.DSP_MANAGER_TOKEN;
       const blueprintName = "AI_Solution";
       const blueprintFile = "blueprint.yaml";
   
       if (!apiUrl || !token) {
+        console.error("❌ Missing API URL or Token");
         return res.status(500).json({ error: "Missing API URL or Token" });
       }
   
+      console.log("✅ API URL and Token found");
       // Ensure blueprint.yaml exists
       const blueprintPath = path.join(__dirname, "blueprints", blueprintFile);
+      console.log(`🔍 Checking blueprint file at: ${blueprintPath}`);
       if (!fs.existsSync(blueprintPath)) {
+        console.error("❌ Blueprint file not found:", blueprintPath);
         return res.status(400).json({ error: "Blueprint file not found" });
       }
   
+      console.log("✅ Blueprint file exists");
       // Create form-data for the request
+      console.log("📌 Preparing form-data for upload...");
       const formData = new FormData();
       formData.append("params", JSON.stringify({
         visibility: "tenant",
@@ -89,19 +97,25 @@ app.post("/api/upload-blueprint", async (req, res) => {
         "tenant": "default_tenant"
       };
   
+      console.log("📌 Headers set:", headers);
+      console.log(`📡 Sending PUT request to ${apiUrl}/api/v3.1/blueprints/${blueprintName}`);
       const response = await fetch(`${apiUrl}/api/v3.1/blueprints/${blueprintName}`, {
         method: "PUT",
         headers: headers,
         body: formData
       });
   
+      console.log("📥 Response received, Status:", response.status);
       if (!response.ok) {
         const errorData = await response.json();
+        console.error("❌ Upload failed:", errorData);
         return res.status(response.status).json({ error: errorData.messages[0].message });
       }
   
+      console.log("✅ Blueprint uploaded successfully!");
       return res.status(200).json({ message: "Blueprint uploaded successfully!" });
     } catch (error) {
+      console.error("❌ Exception caught:", error);
       return res.status(500).json({ error: error.message });
     }
   });
