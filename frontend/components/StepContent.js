@@ -69,7 +69,7 @@ const StepContent = ({
               }`}
               onClick={() => {
                 setSelectedOption(option);
-                if (option === "Connect to a target system") {
+                if (option === "Remote VM") {
                   handleConnectToRemote();
                 } else {
                   handleGetLocalSpecs();

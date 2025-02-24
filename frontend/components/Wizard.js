@@ -5,28 +5,28 @@ import StepContent from "./StepContent";
 
 const modelDetails = [
   {
-    name: "deepseek-ai/DeepSeek-R1",
-    parameters: "1.2B",
-    size: "2GB",
-    requirements: "Requires 8GB RAM, CUDA 10.0+",
+    name: "LLaMA 2-13B",
+    parameters: "13B",
+    size: "48GB",
+    requirements: "Requires 24GB RAM",
   },
   {
-    name: "mistralai/Mistral-Small-24B-Instruct-2501",
+    name: "Mistral-Small-24B-Instruct-2501",
     parameters: "24B",
     size: "25GB",
-    requirements: "Requires 64GB RAM, CUDA 11.3+",
+    requirements: "Requires 64GB RAM",
   },
   {
-    name: "Zyphra/Zonos-v0.1-hybrid",
-    parameters: "2.5B",
-    size: "3GB",
-    requirements: "Requires 16GB RAM, CUDA 11.0+",
+    name: "Falcon-40B",
+    parameters: "40B",
+    size: "50GB",
+    requirements: "Requires 48GB RAM",
   },
   {
-    name: "microsoft/OmniParser-v2.0",
-    parameters: "800M",
-    size: "1.5GB",
-    requirements: "Requires 4GB RAM",
+    name: "Mistral-7B",
+    parameters: "7B",
+    size: "45GB",
+    requirements: "Requires 16GB RAM",
   }
 ];
 
@@ -34,14 +34,14 @@ const steps = [
   { title: "Start", content: "Welcome to the Tailor AI Wizard. Click Next to begin.", options: [] },
   { title: "User Defines Task", content: "Describe your AI use case. The system will recommend an AI task for you.",
     options: ["Image-Text-to-Text", "Image Classification", "Mask Generation", "Text-to-Video"] },
-  { title: "Machine Specs", content: "We need to check system specs for AI model compatibility. How would you like to proceed?",
-    options: ["Gather local machine specs", "Connect to a target system"] },
+  { title: "Machine Specs", content: "ready to analyze system specs",
+    options: ["Local machine", "Remote VM"] },
   { title: "Show Specs", content: "The Machine specs collected are:",
     options: ["Proceed", "Abort"] },
   { title: "Suggest Models", content: "According to your specs, we recommend these models:", 
     options: modelDetails },
   { title: "Quantization", content: "To optimize performance, please choose a quantization factor.",
-    options: [ "Do not quantize", "Quantize by factor of 2", "Quantize by factor of 4"] },
+    options: [ "No Quantization (47.2 GB)", "Quantization by x2 (25.05 GB)", "Quantization by x4 (14.33 GB)"] },
   { title: "Deployment", content: "Moving on to the deployment", options: ["Upload blueprint.yaml to Dell Cloudify", "Cancel"] },
   { title: "Completed", content: "🎉 The wizard is complete! Thank you for using Tailor AI.", options: [] }
 ];
