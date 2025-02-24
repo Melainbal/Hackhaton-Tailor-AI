@@ -16,9 +16,9 @@ exports.connectToRemote = async (req, res) => {
         console.log("✅ SSH Connection Established!");
 
         const scriptPath = "hackathon-scripts/spec.py";
-        const command = `python3 ${scriptPath}`;
+        const command = `/opt/conda/bin/python3 ${scriptPath}`;
 
-        console.log(`🔄 Running script: ${command}`);
+        console.log(`Running script: ${command}`);
 
         conn.exec(command, (err, stream) => {
             if (err) {
@@ -64,7 +64,7 @@ exports.connectToRemote = async (req, res) => {
         });
     })
     .on("error", (err) => {
-        console.error("❌ SSH Connection Error:", err);
+        console.error("SSH Connection Error:", err);
         res.status(500).json({ error: "SSH Connection Failed", details: err.message });
     })
     .connect(SSH_CONFIG);

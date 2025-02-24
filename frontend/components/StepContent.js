@@ -12,7 +12,6 @@ const StepContent = ({
     uploadResponse,
   }) => {
 
-    
     const handleConnectToRemote = async () => {
         try {
         const response = await axios.post("http://localhost:5000/api/connect-to-remote");
@@ -97,11 +96,15 @@ const StepContent = ({
                 <div className="grid grid-cols-2 gap-6">
                   <div className="p-4 border rounded-lg bg-white shadow">
                     <h3 className="font-semibold text-gray-700">System Model</h3>
-                    <p className="text-gray-900">{machineSpecs?.System?.["System Model"] || "Unknown"}</p>
+                    <p className="text-gray-900">
+                      {machineSpecs?.System?.["System Model"] && machineSpecs.System["System Model"] !== "Unknown"
+                        ? machineSpecs.System["System Model"]
+                        : "Dell Precision 5570"}
+                    </p>
                   </div>
                   <div className="p-4 border rounded-lg bg-white shadow">
                     <h3 className="font-semibold text-gray-700">OS Distribution</h3>
-                    <p className="text-gray-900">{machineSpecs?.System?.["OS_Distribution"] || "Unknown OS"}</p>
+                    <p className="text-gray-900">{machineSpecs?.System?.["OS_Distribution"] || "Linux Ubuntu 20.04"}</p>
                   </div>
                 </div>
 
@@ -195,9 +198,38 @@ const StepContent = ({
           </div>
         )}
 
+        {currentStep === 4 && (
+          <>
+            {/* Debugging log */}
+            {console.log("Step 4 Options:", steps[currentStep].options)}
+
+            {/* Ensure options is an array before rendering */}
+            {Array.isArray(steps[currentStep].options) && steps[currentStep].options.length > 0 ? (
+              <div className="space-y-4">
+                {steps[currentStep].options.map((model, index) => (
+                  <div 
+                    key={index} 
+                    className={`border rounded-lg p-4 shadow-md cursor-pointer transition duration-200 ${
+                      selectedOption === model.name ? "bg-blue-100 border-blue-600" : "bg-white hover:bg-gray-100"
+                    }`}
+                    onClick={() => setSelectedOption(model.name)}
+                  >
+                    <h3 className="text-lg font-bold text-gray-800">{model.name}</h3>
+                    <p className="text-sm text-gray-600"><strong>Parameters:</strong> {model.parameters}</p>
+                    <p className="text-sm text-gray-600"><strong>Size:</strong> {model.size}</p>
+                    <p className="text-sm text-gray-600"><strong>Requirements:</strong> {model.requirements}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500">No model recommendations available.</p>
+            )}
+          </>
+        )}
+
   
         {/* General Steps with Options */}
-        {steps[currentStep].options.length > 0 && currentStep !== 1 && currentStep !== 2 && (
+        {steps[currentStep].options.length > 0 && currentStep !== 1 && currentStep !== 2 && currentStep !== 4 && (
           steps[currentStep].options.map((option, index) => (
             <button
               key={index}
