@@ -20,13 +20,19 @@ npm install
 
 Create a .env file in the backend/ folder with the following:
 
-PORT=5000
-
 SSH_HOST=your_host
 
 SSH_USER=your_username
 
 SSH_KEY_PATH=path_to_ssh_key
+
+SSH_PASS
+
+DSP_MANAGER_URL
+
+DSP_MANAGER_TOKEN
+
+---------------------------
 
 4️⃣ Start the backend server
 
