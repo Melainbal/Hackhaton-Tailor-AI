@@ -12,33 +12,60 @@ exports.connectToRemote = async (req, res) => {
     console.log("Attempting SSH Connection...");
 
     conn
-        .on("ready", () => {
-            console.log("SSH Connection Established!");
+    .on("ready", () => {
+        console.log("✅ SSH Connection Established!");
 
-            // Run commands on remote machine
-            conn.exec("bash -c 'lscpu; free -h; uname -a'", (err, stream) => {
-                if (err) {
-                    console.error("Error executing SSH command:", err);
-                    res.status(500).json({ error: "Error executing command" });
-                    return;
-                }
+        const scriptPath = "hackathon-scripts/spec.py";
+        const command = `python3 ${scriptPath}`;
 
-                let output = "";
+        console.log(`🔄 Running script: ${command}`);
 
-                stream
-                    .on("data", (data) => {
-                        output += data.toString();
-                    })
-                    .on("close", () => {
-                        conn.end();
-                        console.log("Specs Retrieved Successfully!");
-                        res.json({ message: "Specs Retrieved", specs: output });
-                    });
-            });
-        })
-        .on("error", (err) => {
-            console.error("SSH Connection Error:", err);
-            res.status(500).json({ error: "SSH Connection Failed" });
-        })
-        .connect(SSH_CONFIG);
+        conn.exec(command, (err, stream) => {
+            if (err) {
+                console.error("Error executing script:", err);
+                return res.status(500).json({ error: "Error executing script", details: err.message });
+            }
+
+            let output = "";
+            let errorOutput = "";
+
+            stream
+                .on("data", (data) => {
+                    output += data.toString();
+                })
+                .on("stderr", (data) => {
+                    errorOutput += data.toString();
+                    console.error("Python Script STDERR:", data.toString());
+                })
+                .on("close", (code, signal) => {
+                    conn.end();
+                    if (code !== 0) {
+                        console.error(`Script exited with code ${code}, signal: ${signal}`);
+                        console.error("Full STDERR Output:", errorOutput);
+
+                        return res.status(500).json({
+                            error: "Script execution failed",
+                            exitCode: code,
+                            signal,
+                            stderr: errorOutput,
+                        });
+                    } else {
+                        console.log("Script executed successfully!");
+
+                        try {
+                            const parsedOutput = JSON.parse(output);
+                            return res.json({ message: "Specs Retrieved", specs: parsedOutput });
+                        } catch (parseError) {
+                            console.error("JSON Parse Error:", parseError);
+                            return res.json({ message: "Specs Retrieved", rawOutput: output });
+                        }
+                    }
+                });
+        });
+    })
+    .on("error", (err) => {
+        console.error("❌ SSH Connection Error:", err);
+        res.status(500).json({ error: "SSH Connection Failed", details: err.message });
+    })
+    .connect(SSH_CONFIG);
 };

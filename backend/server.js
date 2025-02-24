@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const blueprintRoutes = require("./routes/blueprintRoutes");
-const sshRoutes = require("./routes/sshRoutes");
+const specsRoutes = require("./routes/specsRoutes");
 const cors = require("cors");
 
 const app = express();
@@ -12,6 +12,6 @@ app.use(express.json());
 
 // Register API routes
 app.use("/api", blueprintRoutes);
-app.use("/api", sshRoutes);
+app.use("/api", specsRoutes);
 
 app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
