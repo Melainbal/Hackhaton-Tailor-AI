@@ -41,7 +41,7 @@ const steps = [
   { title: "Suggest Models", content: "According to your specs, we recommend these models:", 
     options: modelDetails },
   { title: "Quantization", content: "To optimize performance, please choose a quantization factor.",
-    options: ["Quantize by factor of 4", "Quantize by factor of 2", "Do not quantize"] },
+    options: [ "Do not quantize", "Quantize by factor of 2", "Quantize by factor of 4"] },
   { title: "Deployment", content: "Moving on to the deployment", options: ["Upload blueprint.yaml to Dell Cloudify", "Cancel"] },
   { title: "Completed", content: "🎉 The wizard is complete! Thank you for using Tailor AI.", options: [] }
 ];
