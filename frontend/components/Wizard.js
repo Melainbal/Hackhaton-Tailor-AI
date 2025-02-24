@@ -3,6 +3,33 @@ import Image from "next/image";
 import ProgressBar from "./ProgressBar";
 import StepContent from "./StepContent";
 
+const modelDetails = [
+  {
+    name: "deepseek-ai/DeepSeek-R1",
+    parameters: "1.2B",
+    size: "2GB",
+    requirements: "Requires 8GB RAM, CUDA 10.0+",
+  },
+  {
+    name: "mistralai/Mistral-Small-24B-Instruct-2501",
+    parameters: "24B",
+    size: "25GB",
+    requirements: "Requires 64GB RAM, CUDA 11.3+",
+  },
+  {
+    name: "Zyphra/Zonos-v0.1-hybrid",
+    parameters: "2.5B",
+    size: "3GB",
+    requirements: "Requires 16GB RAM, CUDA 11.0+",
+  },
+  {
+    name: "microsoft/OmniParser-v2.0",
+    parameters: "800M",
+    size: "1.5GB",
+    requirements: "Requires 4GB RAM",
+  }
+];
+
 const steps = [
   { title: "Start", content: "Welcome to the Tailor AI Wizard. Click Next to begin.", options: [] },
   { title: "User Defines Task", content: "Describe your AI use case. The system will recommend an AI task for you.",
@@ -12,9 +39,9 @@ const steps = [
   { title: "Show Specs", content: "The Machine specs collected are:",
     options: ["Proceed", "Abort"] },
   { title: "Suggest Models", content: "According to your specs, we recommend these models:", 
-    options: ["deepseek-ai/DeepSeek-R1", "Zyphra/Zonos-v0.1-hybrid", "microsoft/OmniParser-v2.0", "mistralai/Mistral-Small-24B-Instruct-2501"] },
+    options: modelDetails },
   { title: "Quantization", content: "To optimize performance, please choose a quantization factor.",
-    options: ["Quantize by factor of 4 - faster answers, less accurate", "Quantize by factor of 2 - slower answers, more accurate"] },
+    options: ["Quantize by factor of 4", "Quantize by factor of 2", "Do not quantize"] },
   { title: "Deployment", content: "Moving on to the deployment", options: ["Upload blueprint.yaml to Dell Cloudify", "Cancel"] },
   { title: "Completed", content: "🎉 The wizard is complete! Thank you for using Tailor AI.", options: [] }
 ];
