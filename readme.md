@@ -32,8 +32,6 @@ DSP_MANAGER_URL
 
 DSP_MANAGER_TOKEN
 
----------------------------
-
 4️⃣ Start the backend server
 
 node server.js
@@ -41,7 +39,7 @@ node server.js
 🚀 The backend should now be running on http://localhost:5000.
 
 
-
+---------------------------
 
 
 🌍 Frontend Setup (React)
