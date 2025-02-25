@@ -1,7 +1,5 @@
 tosca_definitions_version: nativeedge_1_0
 
-description: Generate Tokens and Create Repository
-
 imports:
   - nativeedge/types/types.yaml
   - plugin:nativeedge-aws-plugin
@@ -9,58 +7,133 @@ imports:
 inputs:
 
   aws_access_key_id:
+    display_label: Aws Access Key Id
     type: string
-    display_label: Access Key
     default: { get_secret: aws_access_key_id }
 
   aws_secret_access_key:
+    display_label: Aws Secret Access Key
     type: string
-    display_label: Secret Key
     default: { get_secret: aws_secret_access_key }
 
-  region_name:
+  aws_region_name:
+    display_label: Aws Region Name
     type: string
-    display_label: Client Config
-    default: us-east-2
+    default: { get_secret: ec2_region_name }
 
-  client_config:
-    type: dict
-    display_label: Client Config
-    description: The dictionary configuration of a boto3 client.
-    default:
-      aws_access_key_id: { get_input: aws_access_key_id }
-      aws_secret_access_key: { get_input: aws_secret_access_key }
-      region_name: { get_input: region_name }
-
-  registry_id:
-    display_label: Registry Id
+  name_bucket:
+    display_label: Name Bucket
     type: string
-    description: Account ID associated with an ECR registry.
+    default: nativeedge-aws-testing-bucket
 
-  repo_name:
-    display_label: Repo Name
-    type: string
-    description: The name of a repo.
+dsl_definitions:
+
+  client_config: &client_config
+    aws_access_key_id: { get_input: aws_access_key_id }
+    aws_secret_access_key: { get_input: aws_secret_access_key }
+    region_name: { get_input: aws_region_name }
 
 node_templates:
 
-  token:
-    type: nativeedge.nodes.aws.ecr.AuthenticationToken
+  bucket:
+    type: nativeedge.nodes.aws.s3.Bucket
     properties:
-      client_config: { get_input: client_config }
       resource_config:
-        registryIds:
-          - { get_input: registry_id }
+        Bucket: { get_input: name_bucket }
+        CreateBucketConfiguration:
+          LocationConstraint: { get_input: aws_region_name }
+      client_config: *client_config
 
-  repo:
-    type: nativeedge.nodes.aws.ecr.Repository
+  bucket_lifecycle_configuration:
+    type: nativeedge.nodes.aws.s3.BucketLifecycleConfiguration
     properties:
-      client_config: { get_input: client_config }
       resource_config:
-        registryId: { get_input: registry_id }
-        repositoryName: { get_input: repo_name }
-        imageTagMutability: MUTABLE
-        imageScanningConfiguration:
-          scanOnPush: true
-        encryptionConfiguration:
-          encryptionType: AES256
+        LifecycleConfiguration:
+          Rules:
+            - ID: Standard Rule LFC
+              Prefix: boto3
+              Status: Disabled
+              Transition:
+                Days: 31
+                StorageClass: STANDARD_IA
+              Expiration:
+                Days: 95
+      client_config: *client_config
+    relationships:
+      - type: nativeedge.relationships.depends_on
+        target: bucket
+
+  bucket_policy:
+    type: nativeedge.nodes.aws.s3.BucketPolicy
+    properties:
+      resource_config:
+        Policy:
+          Version: '2012-10-17'
+          Statement:
+            - Sid: EveryoneGetPlugin
+              Effect: Allow
+              Principal: "*"
+              Action:
+                - "s3:GetObject"
+              Resource: { concat: [ 'arn:aws:s3:::', { get_property: [ bucket, resource_config, Bucket ] }, '/*' ] }
+      client_config: *client_config
+    relationships:
+      - type: nativeedge.relationships.depends_on
+        target: bucket
+
+  bucket_tagging:
+    type: nativeedge.nodes.aws.s3.BucketTagging
+    properties:
+      resource_config:
+        Tagging:
+          TagSet:
+            - Key: Name
+              Value: aws-test-bucket-tagging
+      client_config: *client_config
+    relationships:
+      - type: nativeedge.relationships.depends_on
+        target: bucket
+
+  bucket_object_bytes:
+    type: nativeedge.nodes.aws.s3.BucketObject
+    properties:
+      source_type: 'bytes'
+      resource_config:
+        Bucket: { get_property: [ bucket, resource_config, Bucket ] }
+        Key: 'test-byte-data.txt'
+        kwargs:
+          Body: 'Test Bytes Mode'
+      client_config: *client_config
+    relationships:
+      - type: nativeedge.relationships.depends_on
+        target: bucket
+      - type: nativeedge.relationships.depends_on
+        target: bucket_object_local
+
+  bucket_object_local:
+    type: nativeedge.nodes.aws.s3.BucketObject
+    properties:
+      source_type: 'local'
+      path: './local-s3-object.txt'
+      resource_config:
+        Bucket: { get_property: [ bucket, resource_config, Bucket ] }
+        Key: 'local-s3-object.txt'
+      client_config: *client_config
+    relationships:
+      - type: nativeedge.relationships.depends_on
+        target: bucket
+      - type: nativeedge.relationships.depends_on
+        target: bucket_object_remote
+
+  bucket_object_remote:
+    type: nativeedge.nodes.aws.s3.BucketObject
+    properties:
+      source_type: 'remote'
+      path: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
+      resource_config:
+        Bucket: { get_property: [ bucket, resource_config, Bucket ] }
+        Key: 'dummy.pdf'
+      client_config: *client_config
+    relationships:
+      - type: nativeedge.relationships.depends_on
+        target: bucket
