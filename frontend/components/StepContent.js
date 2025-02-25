@@ -1,4 +1,5 @@
 import axios from "axios";
+import { useState, useEffect } from "react";
 
 const StepContent = ({
     currentStep,
@@ -10,7 +11,29 @@ const StepContent = ({
     setMachineSpecs,
     machineSpecs,
     uploadResponse,
+    setIsStepComplete
   }) => {
+
+    const [progress, setProgress] = useState(0);
+
+    useEffect(() => {
+      if (currentStep === 6) {
+        setIsStepComplete(false); // Disable "Next" when step starts
+  
+        const interval = setInterval(() => {
+          setProgress((oldProgress) => {
+            if (oldProgress >= 100) {
+              clearInterval(interval);
+              setIsStepComplete(true); // ✅ Enable "Next" when done
+              return 100;
+            }
+            return oldProgress + 10;
+          });
+        }, 500);
+  
+        return () => clearInterval(interval);
+      }
+    }, [currentStep, setIsStepComplete]);
 
     const handleConnectToRemote = async () => {
         try {
@@ -227,9 +250,83 @@ const StepContent = ({
           </>
         )}
 
-  
+        {currentStep === 5 && (
+          <>
+            <p className="mb-6 text-gray-700">Select the best model for your system:</p>
+
+            {/* Ensure options exist */}
+            {Array.isArray(steps[currentStep].options) && steps[currentStep].options.length > 0 ? (
+              <div className="border rounded-lg p-4 bg-gray-100 shadow">
+                {steps[currentStep].options.map((model, index) => {
+                  // Define thresholds
+                  const maxFitSize = 16;  // Good fit
+                  const barelyFitsSize = 20;  // Barely fits
+
+                  let statusColor = "bg-green-100 text-green-800"; // Good fit (🟢)
+                  let statusText = "Good fit";
+
+                  if (model.size > barelyFitsSize) {
+                    statusColor = "bg-red-100 text-red-800"; // Too large (🔴)
+                    statusText = "Likely too large for this machine";
+                  } else if (model.size > maxFitSize) {
+                    statusColor = "bg-yellow-100 text-yellow-800"; // Barely fits (🟡)
+                    statusText = "Might be too large";
+                  }
+
+                  return (
+                    <div
+                      key={index}
+                      className={`flex items-center justify-between p-3 border rounded-lg mb-2 bg-white cursor-pointer hover:bg-gray-200 ${
+                        selectedOption === model.name ? "bg-blue-100 border-blue-600" : ""
+                      }`}
+                      onClick={() => setSelectedOption(model.name)}
+                    >
+                      <label className="flex items-center gap-3">
+                        <input
+                          type="radio"
+                          name="model_download"
+                          className="w-5 h-5"
+                          checked={selectedOption === model.name}
+                          onChange={() => setSelectedOption(model.name)}
+                        />
+                        <span className="font-medium">{model.name}</span>
+                        <span className="text-gray-600 text-sm">Mistral Small 24B Instruct 2501</span>
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <span className={`px-2 py-1 rounded-lg text-xs font-semibold ${statusColor}`}>
+                          {statusText}
+                        </span>
+                        <span className="text-gray-900 font-semibold">{model.size} GB</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-gray-500">No model downloads available.</p>
+            )}
+          </>
+        )}
+
+        {currentStep === 6 && (
+                <>
+                  <h2 className="text-2xl font-bold text-gray-800 mb-4">In Progress</h2>
+                  <p className="mb-6 text-gray-700">Optimizing the model for performance...</p>
+
+                  {/* Progress Bar */}
+                  <div className="w-full bg-gray-200 rounded-full h-6 overflow-hidden">
+                    <div
+                      className="h-full bg-blue-500 transition-all"
+                      style={{ width: `${progress}%` }}
+                    ></div>
+                  </div>
+                  
+                  <p className="mt-2 text-gray-600">{progress}% Downloaded</p>
+                </>
+        )}
+
         {/* General Steps with Options */}
-        {steps[currentStep].options.length > 0 && currentStep !== 1 && currentStep !== 2 && currentStep !== 4 && (
+        {steps[currentStep].options.length > 0 && currentStep !== 1 && currentStep !== 2 && currentStep !== 4 && currentStep !==5 && currentStep!==6 &&(
           steps[currentStep].options.map((option, index) => (
             <button
               key={index}
