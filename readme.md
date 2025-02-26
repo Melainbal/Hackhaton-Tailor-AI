@@ -6,38 +6,38 @@ A wizard that allows you to match a custom fit llm model to your user task and m
 
 The problem:
 
-Customer experience around AI model selection and deployment is complex and labor intensive.​
+  1. Customer experience around AI model selection and deployment is complex and labor intensive.​
 
-Lacking support for automated model mobilization across Dell platforms and scaling to fit target H/W.
+  2. Lacking support for automated model mobilization across Dell platforms and scaling to fit target H/W.
 
 The solution:
 
-Analyze customer H/W and model requirements​
+  1. Analyze customer H/W and model requirements​
 
-Cloud, servers, PCs/Laptops, edge devices​
+  2. Cloud, servers, PCs/Laptops, edge devices​
 
-Leverage model compression techniques such as quantization and knowledge distillation​
+  3. Leverage model compression techniques such as quantization and knowledge distillation​
 
-Automate model mobilization + serving at scale​
+  4. Automate model mobilization + serving at scale​
 
 
 Steps:
 
-Start​
+  1. Start​
 
-User Defines Task​
+  2. User Defines Task​
 
-Get Machine Specs​
+  3. Get Machine Specs​
 
-Analyze Specs vs. Model​
+  4. Analyze Specs vs. Model​
 
-Suggest Models​
+  5. Suggest Models​
 
-Quantize​
+  6. Quantize​
 
-Deploy​
+  7. Deploy​
 
-End​
+  8. End​
 
 ---
 
