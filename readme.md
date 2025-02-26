@@ -2,6 +2,8 @@
 
 Tailor AI Wizard is a full-stack application with both a **frontend (React)** and a **backend (Node.js & Express)**.
 
+A wizard that allows you to match a custom fit llm model to your user task and machine specs.
+
 ---
 
 ## ⚙️ **Setup Instructions**
