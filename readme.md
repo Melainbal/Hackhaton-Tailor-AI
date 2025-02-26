@@ -4,6 +4,41 @@ Tailor AI Wizard is a full-stack application with both a **frontend (React)** an
 
 A wizard that allows you to match a custom fit llm model to your user task and machine specs.
 
+The problem:
+
+Customer experience around AI model selection and deployment is complex and labor intensive.​
+
+Lacking support for automated model mobilization across Dell platforms and scaling to fit target H/W.
+
+The solution:
+
+Analyze customer H/W and model requirements​
+
+Cloud, servers, PCs/Laptops, edge devices​
+
+Leverage model compression techniques such as quantization and knowledge distillation​
+
+Automate model mobilization + serving at scale​
+
+
+Steps:
+
+Start​
+
+User Defines Task​
+
+Get Machine Specs​
+
+Analyze Specs vs. Model​
+
+Suggest Models​
+
+Quantize​
+
+Deploy​
+
+End​
+
 ---
 
 ## ⚙️ **Setup Instructions**
